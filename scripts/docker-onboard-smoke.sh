@@ -37,6 +37,16 @@ PRESERVE_CONTAINER_ON_EXIT="false"
 
 mkdir -p "$DATA_DIR"
 
+# Start from an empty dump. `dump_container_logs` only writes when there is a
+# container to read, so a run that fails before one exists — a failed build, a
+# port already bound — would otherwise leave the previous run's file in place,
+# and that file would be read as this run's diagnostics. Truncated rather than
+# removed, so the path is present and writable from here on.
+if [[ -n "$SMOKE_LOG_FILE" ]]; then
+  mkdir -p "$(dirname "$SMOKE_LOG_FILE")" >/dev/null 2>&1 || true
+  : >"$SMOKE_LOG_FILE" 2>/dev/null || true
+fi
+
 # Copy the container's logs out while there is still a container to read them
 # from.
 #

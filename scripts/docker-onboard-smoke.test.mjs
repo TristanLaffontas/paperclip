@@ -65,6 +65,19 @@ test("the log dump has a destination, and callers are told where it is", () => {
   assert.match(script, /printf 'SMOKE_LOG_FILE=%q\\n' "\$SMOKE_LOG_FILE"/);
 });
 
+test("the log dump starts empty on every run", () => {
+  // A caller that reuses one path — the default does, for a fixed container
+  // name — must not be handed the previous run's logs as this run's evidence
+  // when this run fails before a container exists.
+  const truncateAt = script.search(/^\s*: >"\$SMOKE_LOG_FILE"/m);
+  const dumpAt = script.indexOf("dump_container_logs() {");
+  assert.ok(truncateAt !== -1, "the script must truncate SMOKE_LOG_FILE at startup");
+  assert.ok(
+    truncateAt < dumpAt,
+    "the truncation must happen before anything can write the dump",
+  );
+});
+
 test("workflow fixes the container name before the harness runs", () => {
   assert.match(dockerJob, /^    env:$/m);
   assert.match(dockerJob, /SMOKE_CONTAINER_NAME: release-smoke-onboard/);
