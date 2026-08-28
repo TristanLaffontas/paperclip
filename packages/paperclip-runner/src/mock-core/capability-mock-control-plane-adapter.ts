@@ -1591,6 +1591,12 @@ function isSemanticToolRuntimeSnapshot(
     ) {
       return false;
     }
+    if (
+      canonicalJson(operationResults[extension.resultId]) !==
+      canonicalJson(execution.value)
+    ) {
+      return false;
+    }
     keys.add(extension.key);
     return true;
   });
