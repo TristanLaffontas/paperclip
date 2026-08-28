@@ -649,8 +649,14 @@ export function Layout() {
 
         <div className={cn("flex min-w-0 flex-col", isMobile ? "w-full" : "h-full flex-1")}>
           <div
+            data-mobile-header={isMobile ? "true" : undefined}
+            aria-hidden={isMobile && !mobileNavVisible ? true : undefined}
+            inert={isMobile && !mobileNavVisible ? true : undefined}
             className={cn(
-              isMobile && "sticky top-0 z-20 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/85",
+              isMobile && "sticky top-0 z-20 overflow-hidden bg-background/95 backdrop-blur transition-[max-height,opacity,transform] duration-200 ease-out motion-reduce:transition-none supports-[backdrop-filter]:bg-background/85",
+              isMobile && (mobileNavVisible
+                ? "max-h-(--sz-240px) translate-y-0 opacity-100"
+                : "pointer-events-none max-h-0 -translate-y-full opacity-0"),
             )}
           >
             <StandaloneBrowserControls mobile={isMobile} />
