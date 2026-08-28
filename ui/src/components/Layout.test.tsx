@@ -338,12 +338,16 @@ describe("Layout", () => {
     expect(header()?.getAttribute("aria-hidden")).toBe("true");
     expect(header()?.hasAttribute("inert")).toBe(true);
 
+    await act(async () => { header()?.dispatchEvent(new Event("transitionend", { bubbles: true })); });
+
     for (const nextTop of [35, 30]) {
       scrollTop = nextTop;
       await act(async () => { window.dispatchEvent(new Event("scroll")); });
     }
     expect(header()?.className).toContain("max-h-(--sz-240px)");
     expect(header()?.hasAttribute("inert")).toBe(false);
+
+    await act(async () => { header()?.dispatchEvent(new Event("transitionend", { bubbles: true })); });
 
     scrollTop = 0;
     await act(async () => { window.dispatchEvent(new Event("scroll")); });
