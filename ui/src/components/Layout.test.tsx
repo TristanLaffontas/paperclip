@@ -330,14 +330,18 @@ describe("Layout", () => {
     expect(header()?.className).toContain("max-h-(--sz-240px)");
     expect(header()?.getAttribute("aria-hidden")).toBeNull();
 
-    scrollTop = 120;
-    await act(async () => { window.dispatchEvent(new Event("scroll")); });
+    for (const nextTop of [28, 33, 39]) {
+      scrollTop = nextTop;
+      await act(async () => { window.dispatchEvent(new Event("scroll")); });
+    }
     expect(header()?.className).toContain("max-h-0");
     expect(header()?.getAttribute("aria-hidden")).toBe("true");
     expect(header()?.hasAttribute("inert")).toBe(true);
 
-    scrollTop = 80;
-    await act(async () => { window.dispatchEvent(new Event("scroll")); });
+    for (const nextTop of [35, 30]) {
+      scrollTop = nextTop;
+      await act(async () => { window.dispatchEvent(new Event("scroll")); });
+    }
     expect(header()?.className).toContain("max-h-(--sz-240px)");
     expect(header()?.hasAttribute("inert")).toBe(false);
 

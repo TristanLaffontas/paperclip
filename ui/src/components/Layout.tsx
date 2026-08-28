@@ -134,6 +134,8 @@ export function Layout() {
   const isSkillsRoute = isSkillsStoreRoute(location.pathname, companyPrefix);
   const onboardingTriggered = useRef(false);
   const lastMainScrollTop = useRef(0);
+  const mobileNavScrollAnchor = useRef(0);
+  const mobileNavScrollDirection = useRef<-1 | 0 | 1>(0);
   const previousPathname = useRef<string | null>(null);
   const mainContentRef = useRef<HTMLElement | null>(null);
   const scrollMemory = useRef(new NavigationScrollMemory());
@@ -474,13 +476,21 @@ export function Layout() {
   }, [isMobile, sidebarOpen, setSidebarOpen]);
 
   const updateMobileNavVisibility = useCallback((currentTop: number) => {
-    const delta = currentTop - lastMainScrollTop.current;
+    const previousTop = lastMainScrollTop.current;
+    const direction = currentTop > previousTop ? 1 : currentTop < previousTop ? -1 : 0;
+
+    if (direction !== 0 && direction !== mobileNavScrollDirection.current) {
+      mobileNavScrollDirection.current = direction;
+      mobileNavScrollAnchor.current = previousTop;
+    }
 
     if (currentTop <= 24) {
       setMobileNavVisible(true);
-    } else if (delta > 8) {
+      mobileNavScrollAnchor.current = currentTop;
+      mobileNavScrollDirection.current = 0;
+    } else if (direction > 0 && currentTop - mobileNavScrollAnchor.current > 8) {
       setMobileNavVisible(false);
-    } else if (delta < -8) {
+    } else if (direction < 0 && mobileNavScrollAnchor.current - currentTop > 8) {
       setMobileNavVisible(true);
     }
 
@@ -491,6 +501,8 @@ export function Layout() {
     if (!isMobile) {
       setMobileNavVisible(true);
       lastMainScrollTop.current = 0;
+      mobileNavScrollAnchor.current = 0;
+      mobileNavScrollDirection.current = 0;
       return;
     }
 
